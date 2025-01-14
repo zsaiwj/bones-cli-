@@ -81,6 +81,7 @@ declare module "bitcore-lib-doge" {
     }
 
     class Output {
+      satoshis: number;
       constructor(data: { satoshis: number; script: ScriptInstance });
     }
 
@@ -97,8 +98,10 @@ declare module "bitcore-lib-doge" {
 
   class Transaction {
     static FEE_PER_KB: number;
+    id: string;
     inputs: Transaction.Input[];
-    constructor();
+    outputs: Transaction.Output[];
+    constructor(hex?: string);
     addInput(input: Transaction.Input): this;
     addOutput(output: Transaction.Output): this;
     to(address: string, amount: number): this;

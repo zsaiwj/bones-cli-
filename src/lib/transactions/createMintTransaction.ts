@@ -7,6 +7,7 @@ import { hex } from "@scure/base";
 import { getDogeSpender, utxo2InputDoge } from "./utils";
 import { createScript } from "../protocolMessages/keepsake";
 import { BONES_UTXO_TARGET_SIZE } from "../constants";
+import { getFundingUtxosAfterTx } from "../utils/utxos/getFundingUtxosAfterTransaction";
 
 const BASE_COLLECTOR_OUTPUT_INDEX = 1;
 const MINT_COLLECTOR_OUTPUT_INDEX = 2;
@@ -87,10 +88,27 @@ export const createMintTransactions = ({
 
     const mintTx = mintTxEstimation.tx;
 
+    const change = mintTxEstimation.change;
     if (!mintTx) throw new Error("Failed to create mint transaction");
 
     mintTx.sign(hdPrivateKey);
     mintTx.finalize();
+
+    // we set the 2 caches
+    const { unusedFundingUtxos, txOutputs } = getFundingUtxosAfterTx({
+      tx: mintTx,
+      fundingUtxos: fundingUtxosCache,
+    });
+
+    if (change) {
+      fundingUtxosCache = [
+        ...unusedFundingUtxos,
+        txOutputs[txOutputs.length - 1],
+      ];
+    } else {
+      fundingUtxosCache = unusedFundingUtxos;
+    }
+    boneUtxosCache = [txOutputs[BASE_COLLECTOR_OUTPUT_INDEX]];
 
     mintTxs.push(mintTx);
   }

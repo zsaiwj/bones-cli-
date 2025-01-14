@@ -106,6 +106,7 @@ export type UTXO = {
   };
   value: number;
   scriptpubkey_address?: string;
+  baseBoneAmount?: string;
 };
 
 export type EnhancedUTXO = UTXO & {

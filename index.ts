@@ -102,29 +102,33 @@ bones
       process.exit(1);
     }
 
-    const rawBoneUtxos = bonesList
-      .filter((b) => b.ticker === ticker)
-      .map((b) => {
-        const [txid, voutStr] = b.output.split(":");
-        return {
-          txid,
-          vout: parseInt(voutStr, 10),
-          value: b.value,
-          status: {
-            confirmed: true,
-            block_height: 0,
-            block_hash: "",
-            block_time: 0,
-          },
-        } as EnhancedUTXO;
-      });
+    const rawBoneUtxos = bonesList.map((b) => {
+      const [txid, voutStr] = b.output.split(":");
+      return {
+        txid,
+        vout: parseInt(voutStr, 10),
+        value: b.value,
+        status: {
+          confirmed: true,
+          block_height: 0,
+          block_hash: "",
+          block_time: 0,
+        },
+        baseBoneAmount: b.amount,
+      } as EnhancedUTXO;
+    });
     rawBoneUtxos.sort((a, b) => Number(BigInt(b.value) - BigInt(a.value)));
     let selectedBoneUtxos: EnhancedUTXO[] = [];
     let collected = 0n;
     for (const utxo of rawBoneUtxos) {
       selectedBoneUtxos.push(utxo);
-      collected += BigInt(utxo.value);
+      collected += BigInt(utxo.baseBoneAmount || 0);
       if (collected >= requiredAmount) break;
+    }
+
+    if (collected < requiredAmount) {
+      console.error("Insufficient bones!");
+      process.exit(1);
     }
 
     const txs = createMintTransactions({
