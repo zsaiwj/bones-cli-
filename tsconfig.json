@@ -9,6 +9,6 @@
   },
   "files": [
     "src/types.d.ts",
-    "src/index.ts"
+    "index.ts"
   ]
 }

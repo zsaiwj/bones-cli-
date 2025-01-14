@@ -113,7 +113,8 @@ bones
     await postTransactionRaw(commitTx.hex);
 
     const totalSupply =
-      boneDeployParams.mintTerms.amount * boneDeployParams.mintTerms.cap;
+      boneDeployParams.mintTerms.amount * boneDeployParams.mintTerms.cap +
+      boneDeployParams.seed;
 
     const transaction: BaseTransaction = TransactionFactory.createTransaction({
       transactionType: "deploy",
@@ -123,8 +124,7 @@ bones
       state: TransactionState.Created,
       priceInRelic: boneDeployParams.mintTerms.price,
       symbol: boneDeployParams.symbol,
-      totalSupply:
-        boneDeployParams.mintTerms.amount * boneDeployParams.mintTerms.cap,
+      totalSupply,
       tick: ticker,
       liquidityShare: Number(
         ((boneDeployParams.seed * 100n) / totalSupply).toString(),
@@ -352,8 +352,7 @@ tickers
   .command("claim")
   .description("Claim a ticker by spending BONE")
   .argument("[ticker]", "The ticker you want to claim")
-  .argument("[receiver]", "The receiver of the ticker inscription")
-  .action(async (ticker, receiver) => {
+  .action(async (ticker) => {
     const deployableTicker = ticker.replace(/^•+|•+$/g, "");
     const sealingPrice = SEAL_PRICE_IN_BASE_TOKEN(deployableTicker.length);
     if (sealingPrice === null) {

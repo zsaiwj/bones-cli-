@@ -39,7 +39,7 @@ export const createSealingTransactions = ({
     {
       script: hex.decode(p2sh.toHex()),
       amount: BigInt(
-        BONES_UTXO_TARGET_SIZE + INSCRIPTION_TARGET_SIZE + 3_271_000,
+        BONES_UTXO_TARGET_SIZE + INSCRIPTION_TARGET_SIZE + 4_271_000,
       ),
     },
   ];

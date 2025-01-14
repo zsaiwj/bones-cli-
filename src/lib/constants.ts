@@ -8,7 +8,7 @@ export const ELECTRUM_URL = process.env.BONES_CLI_ELECTRUM_URL ?? "";
 export const ORD_URL = process.env.BONES_CLI_ORD_URL ?? "";
 export const BONES_UTXO_TARGET_SIZE = 100_000;
 export const INSCRIPTION_TARGET_SIZE = 100_000;
-export const FEE_PER_BYTE = 9000n;
+export const FEE_PER_BYTE = 11000n;
 
 const DEFAULT_NETWORK_ID = "doge";
 

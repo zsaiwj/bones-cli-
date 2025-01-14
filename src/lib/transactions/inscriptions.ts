@@ -76,7 +76,6 @@ export const getP2sh = ({
 } => {
   const privateKey = new PrivateKey(privKey);
   const publicKey = privateKey.toPublicKey();
-  console.log("publicKey", publicKey);
 
   const hexData = Buffer.from(JSON.stringify(text)).toString("hex");
   let data = Buffer.from(hexData, "hex");
