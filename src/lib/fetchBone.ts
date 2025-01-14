@@ -3,8 +3,22 @@ import { BigNumber } from "bignumber.js";
 import { ORD_URL } from "./constants";
 import { InscriptionData, OutputData } from "./types";
 
+type MintTerms = {
+  amount: number;
+  cap: number;
+  price: number;
+};
+
+type State = {
+  mints: number;
+};
+
 type BoneData = {
   id: string;
+  entry: {
+    mint_terms: MintTerms;
+    state: State;
+  };
 };
 
 export const fetchBone = async (ticker: string): Promise<BoneData> => {

@@ -6,6 +6,7 @@ import { Keepsake } from "../types";
 import { MAX_SCRIPT_ELEMENT_SIZE, createScriptWithProtocolMsg } from "./utils";
 import { encodeTransfersProtocolMessage } from "./transfers";
 import { encodeDeploymentProtocolMessage } from "./deploy";
+import { encodeMintProtocolMessage } from "./mint";
 
 export function encodeProtocolMessage(keepsake: Keepsake): Uint8Array {
   let result = new Uint8Array();
@@ -30,6 +31,10 @@ export function encodeProtocolMessage(keepsake: Keepsake): Uint8Array {
       encodeDeploymentProtocolMessage(keepsake.deployment);
     flags = flags | deploymentFlags;
     result = new Uint8Array([...result, ...deploypmentProtocolMessage]);
+  }
+  if (keepsake.mint) {
+    const mintProtocolMessage = encodeMintProtocolMessage(keepsake.mint);
+    result = new Uint8Array([...result, ...mintProtocolMessage]);
   }
 
   // Set flags

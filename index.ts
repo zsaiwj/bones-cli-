@@ -28,6 +28,10 @@ import {
   createDeployTransaction,
 } from "./src/lib/transactions/createDeployTransaction";
 import { WalletAccount } from "./src/lib/WalletAccount";
+import {
+  BoneMintParams,
+  createMintTransactions,
+} from "./src/lib/transactions/createMintTransaction";
 
 program
   .name("transactions-cli")
@@ -35,6 +39,117 @@ program
   .version("0.1.0");
 
 const bones = program.command("bones").description("Manage bones");
+
+bones
+  .command("mint")
+  .description("Mint new bones")
+  .argument("[ticker]", "The ticker of the bone to be minted")
+  .argument("[mints]", "The number of mints")
+  .action(async (ticker, mints) => {
+    if (Number(mints) > 23) {
+      console.error("Max. mints per transaction is 23!");
+      process.exit(1);
+    }
+
+    const bone = await fetchBone(ticker);
+    const [boneBlock, boneTxIndex] = bone.id.split(":");
+
+    if (bone.entry.state.mints >= bone.entry.mint_terms.cap) {
+      console.error("Mint cap reached!");
+      process.exit(1);
+    }
+
+    const boneMintParams: BoneMintParams = {
+      boneId: {
+        block: BigInt(boneBlock),
+        tx: BigInt(boneTxIndex),
+      },
+    };
+
+    const account = unlockWallet();
+    if (!account) {
+      console.error("Account not found!");
+      process.exit(1);
+    }
+
+    const fundingData = await listFundingUtxos(account.getAddress());
+    const fundingUtxos = fundingData.map((utxo: any) => {
+      const [txid, voutStr] = utxo.output.split(":");
+      return {
+        txid,
+        vout: parseInt(voutStr, 10),
+        value: utxo.value,
+        status: {
+          confirmed: true,
+          block_height: 0,
+          block_hash: "",
+          block_time: 0,
+        },
+      } as UTXO; // or EnhancedUTXO if needed
+    });
+
+    const network = BITCOINJSLIB_NETWORK;
+    const { pk } = account.getPrivateKey();
+
+    const requiredAmount = BigInt(bone.entry.mint_terms.price) * BigInt(mints);
+    let totalAmountOwned = 0n;
+    const bonesList = await listBones(account.getAddress(), "BONE");
+    for (const b of bonesList) {
+      totalAmountOwned += BigInt(b.amount);
+    }
+    if (totalAmountOwned < requiredAmount) {
+      console.error("Insufficient bones!");
+      process.exit(1);
+    }
+
+    const rawBoneUtxos = bonesList
+      .filter((b) => b.ticker === ticker)
+      .map((b) => {
+        const [txid, voutStr] = b.output.split(":");
+        return {
+          txid,
+          vout: parseInt(voutStr, 10),
+          value: b.value,
+          status: {
+            confirmed: true,
+            block_height: 0,
+            block_hash: "",
+            block_time: 0,
+          },
+        } as EnhancedUTXO;
+      });
+    rawBoneUtxos.sort((a, b) => Number(BigInt(b.value) - BigInt(a.value)));
+    let selectedBoneUtxos: EnhancedUTXO[] = [];
+    let collected = 0n;
+    for (const utxo of rawBoneUtxos) {
+      selectedBoneUtxos.push(utxo);
+      collected += BigInt(utxo.value);
+      if (collected >= requiredAmount) break;
+    }
+
+    const txs = createMintTransactions({
+      boneMintParams,
+      numOfMints: Number(mints),
+      fundingUtxos,
+      boneUtxos: selectedBoneUtxos,
+      hdPrivateKey: pk,
+      network,
+      feePerByte: FEE_PER_BYTE,
+    });
+
+    const mintTxs = txs.map((tx) => {
+      return TransactionFactory.createTransaction({
+        transactionType: "mint",
+        amount: BigInt(bone.entry.mint_terms.cap),
+        tick: ticker,
+        tx: tx,
+        state: TransactionState.Created,
+      });
+    });
+
+    const postedTxs = await postTransactions(mintTxs);
+    console.log(postedTxs);
+  });
 
 bones
   .command("deploy")
@@ -360,7 +475,6 @@ tickers
       process.exit(1);
     }
 
-    const bone = await fetchBone("BONE");
     const account = unlockWallet();
     if (!account) {
       console.error("Account not found!");
