@@ -45,19 +45,43 @@ For example, to create a new wallet run:
 npm start -- wallet create
 ```
 
-Mint bones:
+Import wallet (mnemonic)：
+
+```bash
+npm start -- wallet impoet (you-MNEMONIC) 
+```
+
+Export the private key of an existing wallet：
+
+```bash
+npm start -- wallet export
+```
+
+List all funds UTXO of the wallet：
+
+```bash
+npm start -- wallet funding
+```
+
+Display existing wallet address：
+
+```bash
+npm start -- wallet received
+```
+
+Mint bones(Replace SWAPPY with the stock code )  (quantity ):
 
 ```bash
 npm start -- bones mint SWAPPY 20
 ```
 
-List bones:
+List bones（All bones ） :
 
 ```bash
 npm start --bones list
 ```
 
-Transfer bones:
+Transfer bones（Replace stock symbol and quantity）:
 
 ```bash
 npm start -- bones transfer SWAPPY 1000000000000 (Receiving Address )
@@ -68,4 +92,7 @@ More commands Execution help:
 ```bash
 npm start -- help
 ```
+
+Experiment with all commands with a small amount of money (be sure to execute with a large amount of money after it is safe/it is very important to protect the private key)
+
 
