@@ -57,7 +57,7 @@ Export the private key of an existing wallet：
 npm start -- wallet export
 ```
 
-List all funds UTXO of the wallet：
+List all funds UTXO of the wallet（doge）：
 
 ```bash
 npm start -- wallet funding
