@@ -78,7 +78,7 @@ export const listTickers = async (address: string) => {
     if (out.inscriptions && out.inscriptions.length > 0) {
       for (const inscription of out.inscriptions) {
         // todo - missing validation here, could have metadata but not be an actual bone
-        if (inscription.inscription.metadata.BONE) {
+        if (inscription.inscription.metadata?.BONE) {
           tickers.push({
             inscriptionId: inscription.inscription_id,
             output: out.output,
