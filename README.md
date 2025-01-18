@@ -63,12 +63,6 @@ List all funds UTXO of the wallet：
 npm start -- wallet funding
 ```
 
-Display existing wallet address：
-
-```bash
-npm start -- wallet received
-```
-
 Mint bones(Replace SWAPPY with the stock code )  (quantity ):
 
 ```bash
