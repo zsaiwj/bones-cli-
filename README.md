@@ -45,4 +45,27 @@ For example, to create a new wallet run:
 npm start -- wallet create
 ```
 
+Mint bones:
+
+```bash
+npm start -- bones mint SWAPPY 20
+```
+
+List bones:
+
+```bash
+npm start --bones list
+```
+
+Transfer bones:
+
+```bash
+npm start -- bones transfer SWAPPY 1000000000000 (Receiving Address )
+```
+
+More commands Execution help:
+
+```bash
+npm start -- help
+```
 
